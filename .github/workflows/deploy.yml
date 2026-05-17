@@ -3,6 +3,10 @@ name: Deploy
 on:
   pull_request_target:
 
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
