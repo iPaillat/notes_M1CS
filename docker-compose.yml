@@ -11,3 +11,8 @@ services:
       bash -c "pip install flask flask-cors requests -q &&
                python /app/backend/app.py"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
