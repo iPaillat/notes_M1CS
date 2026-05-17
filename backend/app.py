@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
@@ -9,6 +10,22 @@ CORS(app)
 NOTES_URL = "https://raw.githubusercontent.com/Gladrat/notes_M1CS/main/notes.json"
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 
+_cache = {"data": None, "ts": 0}
+
+
+def fetch_notes():
+    now = time.time()
+    if _cache["data"] and now - _cache["ts"] < 2:
+        return _cache["data"]
+    r = requests.get(NOTES_URL, timeout=5)
+    r.raise_for_status()
+    data = r.json()
+    if "etudiants" not in data:
+        raise ValueError("invalid structure")
+    _cache["data"] = data
+    _cache["ts"] = now
+    return data
+
 
 @app.route("/")
 def index():
@@ -18,11 +35,7 @@ def index():
 @app.route("/notes")
 def notes():
     try:
-        r = requests.get(NOTES_URL, timeout=5)
-        r.raise_for_status()
-        data = r.json()
-        if "etudiants" not in data:
-            raise ValueError("invalid structure")
+        data = fetch_notes()
     except Exception:
         return jsonify({"error": "Service temporairement indisponible"}), 503
 
@@ -41,9 +54,7 @@ def notes():
 @app.route("/search")
 def search():
     try:
-        r = requests.get(NOTES_URL, timeout=5)
-        r.raise_for_status()
-        data = r.json()
+        data = fetch_notes()
     except Exception:
         return jsonify({"error": "Service temporairement indisponible"}), 503
 
@@ -56,4 +67,4 @@ def search():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host='0.0.0.0', port=5000)
