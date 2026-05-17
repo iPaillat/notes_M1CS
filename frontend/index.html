@@ -7,36 +7,62 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html, body {
+      height: 100%;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #f5f6fa;
       color: #2d3436;
-      min-height: 100vh;
-      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      padding: 18px 24px 12px;
     }
 
     h1 {
       text-align: center;
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       color: #1e1e2e;
+      flex-shrink: 0;
     }
 
     #last-update {
       text-align: center;
-      font-size: 13px;
+      font-size: 12px;
       color: #888;
-      margin-bottom: 28px;
+      margin-bottom: 14px;
+      flex-shrink: 0;
     }
 
     .card {
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 2px 12px rgba(0,0,0,.08);
-      max-width: 760px;
-      margin: 0 auto;
+      flex: 1;
+      min-height: 0;
       overflow: hidden;
+    }
+
+    .columns-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 28px 1fr;
+    }
+
+    .col-divider {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .col-divider::after {
+      content: '';
+      display: block;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, #d0d0de 8%, #d0d0de 92%, transparent);
+      margin: 0 auto;
+      border-radius: 1px;
     }
 
     table {
@@ -46,9 +72,9 @@
 
     thead th {
       background: #f0f0f5;
-      padding: 12px 16px;
+      padding: 10px 12px;
       text-align: left;
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: .6px;
       color: #666;
@@ -69,21 +95,23 @@
     }
 
     td {
-      padding: 12px 16px;
-      font-size: 14px;
+      padding: 8px 12px;
+      font-size: 13px;
+      white-space: nowrap;
     }
 
     .note-cell {
       font-weight: 600;
-      width: 120px;
+      width: 60px;
+      white-space: nowrap;
     }
 
-    .bar-cell { width: 180px; }
+    .bar-cell { width: 120px; }
 
     .bar-wrap {
       background: #eee;
       border-radius: 4px;
-      height: 8px;
+      height: 7px;
       overflow: hidden;
     }
 
@@ -100,8 +128,9 @@
     footer {
       color: #aaa;
       font-size: 12px;
-      margin-top: 40px;
+      margin-top: 10px;
       text-align: center;
+      flex-shrink: 0;
     }
 
     footer a { color: #aaa; text-decoration: none; }
@@ -109,21 +138,37 @@
   </style>
 </head>
 <body>
-  <h1>Notes - Développement Sécurisé</h1>
+  <img src="/assets/Efrei-logo-couleur.svg" alt="Efrei"
+       style="position:absolute; top:18px; left:24px; height:28px; opacity:.9;">
+  <h1>Notes : Développement Sécurisé</h1>
   <div id="last-update">Chargement…</div>
 
   <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Prénom</th>
-          <th>Note</th>
-          <th>Progression</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+    <div class="columns-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Note</th>
+            <th>Progression</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-left"></tbody>
+      </table>
+      <div class="col-divider"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Note</th>
+            <th>Progression</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-right"></tbody>
+      </table>
+    </div>
   </div>
 
   <footer>
@@ -136,7 +181,8 @@
   </footer>
 
   <script>
-    const tbody = document.getElementById("tbody");
+    const tbodyLeft  = document.getElementById("tbody-left");
+    const tbodyRight = document.getElementById("tbody-right");
     const lastUpdate = document.getElementById("last-update");
     let prevNotes = {};
 
@@ -147,8 +193,9 @@
       return "bar-red";
     }
 
-    function render(etudiants) {
-      etudiants.forEach((e, i) => {
+    function renderHalf(etudiants, tbody, offset) {
+      etudiants.forEach((e, j) => {
+        const i = offset + j;
         const key = `${e.nom}-${e.prenom}`;
         const pct = Math.round((e.note / e.sur) * 100);
         const cls = barClass(e.note, e.sur);
@@ -182,6 +229,12 @@
           row.classList.add("highlight");
         }
       });
+    }
+
+    function render(etudiants) {
+      const mid = Math.ceil(etudiants.length / 2);
+      renderHalf(etudiants.slice(0, mid), tbodyLeft, 0);
+      renderHalf(etudiants.slice(mid), tbodyRight, mid);
     }
 
     async function refresh() {

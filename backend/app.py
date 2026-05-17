@@ -32,6 +32,11 @@ def index():
     return send_from_directory(FRONTEND_DIR, "index.html")
 
 
+@app.route("/assets/<path:filename>")
+def assets(filename):
+    return send_from_directory(os.path.join(FRONTEND_DIR, "assets"), filename)
+
+
 @app.route("/notes")
 def notes():
     try:
