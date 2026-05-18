@@ -27,7 +27,7 @@
     {"nom": "MOURLOT", "prenom": "Antoine", "note": 0, "sur": 20},
     {"nom": "NIANG", "prenom": "Bineta", "note": 0, "sur": 20},
     {"nom": "OLOA", "prenom": "Pierre Junior Stephane", "note": 0, "sur": 20},
-    {"nom": "PAILLAT", "prenom": "Ilan", "note": 0, "sur": 20},
+    {"nom": "PAILLAT", "prenom": "Ilan", "note": 20, "sur": 20},
     {"nom": "PERDOUX", "prenom": "Adrien", "note": 0, "sur": 20},
     {"nom": "POUJADE", "prenom": "Corenthin", "note": 0, "sur": 20},
     {"nom": "PRADIÉ NOIR", "prenom": "Jacques", "note": 0, "sur": 20},
